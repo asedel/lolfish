@@ -4,7 +4,7 @@
 #     set -g theme_title_display_user yes
 #     set -g theme_title_use_abbreviated_path no
 
-function __lolish_title_user -S -d 'Display actual user if different from $default_user'
+function __lolfish_title_user -S -d 'Display actual user if different from $default_user'
     if [ "$theme_title_display_user" = 'yes' ]
         if [ "$USER" != "$default_user" -o -n "$SSH_CLIENT" ]
             set -l IFS .
