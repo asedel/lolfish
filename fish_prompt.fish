@@ -91,7 +91,7 @@ function fish_prompt
 
     # abbreviated home directory ~
     if command -s sed &> /dev/null 
-        set current_dir (echo $PWD | sed -e "s,.*$HOME,~," 2> ^/dev/null)
+        set current_dir (echo $PWD | sed -e "s,.*$HOME,~," 2> /dev/null)
     else
         set current_dir $PWD
     end
