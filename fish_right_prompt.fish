@@ -75,53 +75,6 @@ function lolfish -d "such rainbow. wow"
 end
 
 
-# Left side prompt
-#
-# Displays user@hostname:/path
-# Displays git status
-# Displays exit status of previous command
-
-function fish_prompt
-
-    # last command had an error? display the return value
-    set -l exit_status $status
-    if test $exit_status -ne 0
-        set error '(' $exit_status ')'
-    end
-
-    # abbreviated home directory ~
-    if command -s sed > /dev/null ^&1
-        set current_dir (echo $PWD | sed -e "s,.*$HOME,~," ^/dev/null)
-    else
-        set current_dir $PWD
-    end
-
-    # the git stuff
-    # TODO: use git's built in prompt support
-    if command -s git > /dev/null ^&1
-        if git rev-parse --git-dir > /dev/null ^&1
-            set -l git_branch (git rev-parse --abbrev-ref HEAD ^/dev/null)
-            set -l git_status (count (git status -s --ignore-submodules ^/dev/null))
-            if test $git_status -gt 0
-                set git_dir '[' $git_branch ':' $git_status ']'
-            else
-                set git_dir '[' $git_branch ']'
-            end
-        end
-    end
-
-    # hashtag the prompt for root user
-    switch $USER
-        case 'root'
-            set prompt '#'
-        case '*'
-            set prompt '>>'
-    end
-
-    # finally print the prompt
-    lolfish $USER '@' (hostname -s) ':' $current_dir $git_dir $error $prompt ' '
-end
-
 # Right side prompt
 #
 # Displays the number of background processes [&:2]
@@ -133,7 +86,7 @@ function fish_right_prompt
     #
     # background jobs
     #
-    set -l background_jobs (count (jobs -p ^/dev/null))
+    set -l background_jobs (count (jobs -p 2> /dev/null))
     if test $background_jobs -gt 0
         set background_jobs_prompt '[' '&' ':' $background_jobs ']'
     end
@@ -143,8 +96,8 @@ function fish_right_prompt
     # only if the shell is running outside of tmux
     #
     if test -z $TMUX
-        if command -s tmux > /dev/null ^&1
-            set -l tmux_sessions (count (tmux list-sessions ^/dev/null))
+        if command -s tmux &> /dev/null
+            set -l tmux_sessions (count (tmux list-sessions 2> /dev/null))
             if test $tmux_sessions -gt 0
                 set tmux_sessions_prompt '[' 'tmux' ':' $tmux_sessions ']'
             end
@@ -154,9 +107,9 @@ function fish_right_prompt
     #
     # Display the time and date
     #
-    if command -s date > /dev/null ^&1
-        set time (date +'%H:%M' ^/dev/null)
-        set date (date +'%d-%m-%Y' ^/dev/null)
+    if command -s date &> /dev/null
+        set time (date +'%H:%M' 2> /dev/null)
+        set date (date +'%d-%m-%Y' 2> /dev/null)
     end
 
     lolfish $background_jobs_prompt $tmux_sessions_prompt $time ' ' $date
